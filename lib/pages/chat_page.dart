@@ -6,14 +6,33 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
+  final String uid;
+
+  ChatPage(this.uid);
+
   @override
   State<StatefulWidget> createState() => ChatePageState();
 }
 
 class ChatePageState extends State<ChatPage> {
   var msg = TextEditingController();
-  var stream = ChatApi().getMessage();
-  var stream1 = ChatApi().getMessage();
+  var stream1, stream;
+
+  @override
+  void initState() {
+    stream = ChatApi().getMessages(uid: widget.uid);
+    stream1 = ChatApi().getMessages(uid: widget.uid);
+    stream.listen((res) {
+      res.docChanges.forEach((re) {
+        switch (re.type) {
+          case DocumentChangeType.added:
+            // stream1.sink(re.doc.data());
+            break;
+        }
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -37,6 +56,10 @@ class ChatePageState extends State<ChatPage> {
                               ? Alignment.topRight
                               : Alignment.topLeft,
                           child: Container(
+                            alignment: snapshots.data!.docs[index]['uid'] ==
+                                FirebaseAuth.instance.currentUser!.uid
+                                ? Alignment.topRight
+                                : Alignment.topLeft,
                             decoration: BoxDecoration(
                               color: snapshots.data!.docs[index]['uid'] ==
                                       FirebaseAuth.instance.currentUser!.uid
@@ -74,7 +97,9 @@ class ChatePageState extends State<ChatPage> {
                       ChatApi api = ChatApi();
                       api.addMessage(
                           context: context,
-                          message: Message(msg: text, uid: user, dname: name));
+                          message: Message(msg: text, uid: user, dname: name),
+                          uid: widget.uid
+                      );
                       msg.clear();
                     },
                   ),
@@ -85,20 +110,6 @@ class ChatePageState extends State<ChatPage> {
           ],
         ),
       );
-
-  @override
-  void initState() {
-    stream.listen((res) {
-      res.docChanges.forEach((re) {
-        switch (re.type) {
-          case DocumentChangeType.added:
-            // stream1.sink(re.doc.data());
-            break;
-        }
-      });
-    });
-    super.initState();
-  }
 
   @override
   void dispose() {

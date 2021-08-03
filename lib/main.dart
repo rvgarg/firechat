@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firechat/pages/chat_page.dart';
+import 'package:firechat/pages/chat_list.dart';
 import 'package:firechat/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/login': (context) => LoginPage(),
-          '/chat' : (context) => ChatPage(),
+          '/chat': (context) => ChatList(),
         },
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -44,6 +44,6 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: auth == null ? LoginPage() : ChatPage(),
+        body: auth == null ? LoginPage() : ChatList(),
       );
 }

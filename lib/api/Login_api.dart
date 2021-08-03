@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firechat/api/chat_api.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -18,6 +19,7 @@ class LoginApi {
         idToken: googleSignInAuthentication.idToken,
         accessToken: googleSignInAuthentication.accessToken);
     await auth.signInWithCredential(credential).then((value) {
+      ChatApi().addList(uid: auth.currentUser!.uid);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Logged In!!')));
       Navigator.of(context).pushNamed('/chat');

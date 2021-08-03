@@ -9,9 +9,24 @@ class ChatApi {
     reference = FirebaseFirestore.instance.collection('chat');
   }
 
-  getMessage() => reference.orderBy('time').snapshots();
+  getList() => reference.snapshots();
 
-  addMessage({required BuildContext context, required Message message}) async {
-    reference.add(message.toJSON()).then((value) => print('sent'));
+  getMessages({required String uid}) =>
+      reference.doc(uid).collection('chat').snapshots();
+
+  addList({required String uid}) async {
+    if ((await reference.where('uid', isEqualTo: uid).get()).size == 0)
+      reference.add({'uid': uid});
+  }
+
+  addMessage(
+      {required BuildContext context,
+      required Message message,
+      required String uid}) async {
+    reference
+        .doc(uid)
+        .collection('chat')
+        .add(message.toJSON())
+        .then((value) => print('sent'));
   }
 }
