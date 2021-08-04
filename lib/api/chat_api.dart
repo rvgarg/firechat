@@ -31,7 +31,7 @@ class ChatApi {
                 .where('email', isEqualTo: user.email)
                 .get())
             .size ==
-        0) reference.add(user.toJSON());
+        0) FirebaseFirestore.instance.collection('users').add(user.toJSON());
   }
 
   addMessage({required BuildContext context, required Message message}) async {

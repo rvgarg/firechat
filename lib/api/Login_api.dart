@@ -22,7 +22,9 @@ class LoginApi {
     await auth.signInWithCredential(credential).then((value) {
       ChatApi().addList(
           user: u.User(
-              uid: auth.currentUser!.uid, email: auth.currentUser!.email!));
+              uid: auth.currentUser!.uid,
+              email: auth.currentUser!.email!,
+              name: auth.currentUser!.displayName!));
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Logged In!!')));
       Navigator.of(context).pushNamed('/chat');
@@ -41,7 +43,9 @@ class LoginApi {
           .then((value) {
         ChatApi().addList(
             user: u.User(
-                uid: auth.currentUser!.uid, email: auth.currentUser!.email!));
+                uid: auth.currentUser!.uid,
+                email: auth.currentUser!.email!,
+                name: auth.currentUser!.displayName!));
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Logged In!!')));
         Navigator.of(context).pushNamed('/chat');
@@ -82,7 +86,8 @@ class LoginApi {
               ChatApi().addList(
                   user: u.User(
                       uid: auth.currentUser!.uid,
-                      email: auth.currentUser!.phoneNumber!));
+                      email: auth.currentUser!.phoneNumber!,
+                      name: auth.currentUser!.displayName!));
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text('Logged In!!')));
               Navigator.of(context).pushNamed('/chat');

@@ -45,6 +45,9 @@ class ChatePageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text(widget.receiver.name),
+        ),
         body: Stack(
           children: [
             StreamBuilder(
@@ -57,23 +60,21 @@ class ChatePageState extends State<ChatPage> {
                   return ListView.builder(
                     itemBuilder: (context, index) {
                       return Container(
-                        alignment: snapshots.data!.docs[index]['uid'] ==
+                        alignment: snapshots.data!.docs[index]['sender_uid'] ==
                                 FirebaseAuth.instance.currentUser!.uid
                             ? Alignment.topRight
                             : Alignment.topLeft,
                         padding: EdgeInsets.all(10),
-                        child: Align(
-                          alignment: snapshots.data!.docs[index]['uid'] ==
-                                  FirebaseAuth.instance.currentUser!.uid
-                              ? Alignment.topRight
-                              : Alignment.topLeft,
-                          child: Container(
-                            alignment: snapshots.data!.docs[index]['uid'] ==
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          Container(
+                            alignment: snapshots.data!.docs[index]
+                                        ['sender_uid'] ==
                                     FirebaseAuth.instance.currentUser!.uid
                                 ? Alignment.topRight
                                 : Alignment.topLeft,
                             decoration: BoxDecoration(
-                              color: snapshots.data!.docs[index]['uid'] ==
+                              color: snapshots.data!.docs[index]
+                                          ['sender_uid'] ==
                                       FirebaseAuth.instance.currentUser!.uid
                                   ? Colors.blue
                                   : Colors.red,
@@ -84,7 +85,7 @@ class ChatePageState extends State<ChatPage> {
                               snapshots.data!.docs[index]['msg'],
                             ),
                           ),
-                        ),
+                        ]),
                       );
                     },
                     itemCount: snapshots.data!.docs.length,
@@ -102,14 +103,13 @@ class ChatePageState extends State<ChatPage> {
                     icon: Icon(Icons.send),
                     onPressed: () {
                       String text = msg.text.trim();
-                      ChatApi api = ChatApi();
-                      api.addMessage(
+                      ChatApi().addMessage(
                         context: context,
                         message: Message(
                             msg: text,
                             sender_email:
                                 FirebaseAuth.instance.currentUser!.email!,
-                            sender_uid: FirebaseAuth.instance.currentUser!.uid!,
+                            sender_uid: FirebaseAuth.instance.currentUser!.uid,
                             receiver_uid: widget.receiver.uid,
                             receiver_email: widget.receiver.email),
                       );

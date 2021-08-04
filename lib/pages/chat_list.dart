@@ -37,10 +37,10 @@ class ChatListState extends State<ChatList> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Padding(
-                            padding: const EdgeInsets.all(12.0),
+                            padding: const EdgeInsets.all(20.0),
                             child: Icon(
                               Icons.person,
-                              size: 20,
+                              size: 30,
                             ),
                           ),
                         ),
@@ -48,7 +48,7 @@ class ChatListState extends State<ChatList> {
                           padding: EdgeInsets.all(20),
                           child: Align(
                             alignment: Alignment.center,
-                            child: Text(snapshot.data!.docs[index]['uid']),
+                            child: Text(snapshot.data!.docs[index]['name'],style: TextStyle(fontSize: 20),),
                           ),
                         ),
                       ],
