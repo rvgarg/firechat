@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firechat/model/message.dart';
+import 'package:firechat/model/user.dart';
 import 'package:flutter/material.dart';
 
 class ChatApi {
@@ -9,24 +10,31 @@ class ChatApi {
     reference = FirebaseFirestore.instance.collection('chat');
   }
 
-  getList() => reference.snapshots();
+  getList() => FirebaseFirestore.instance.collection('users').snapshots();
 
-  getMessages({required String uid}) =>
-      reference.doc(uid).collection('chat').snapshots();
+  getMessages(
+          {required String sender_uid,
+          required String sender_email,
+          required String receiver_uid,
+          required String receiver_email}) =>
+      reference
+          .where('sender_uid', isEqualTo: sender_uid)
+          .where('sender_email', isEqualTo: sender_email)
+          .where('receiver_uid', isEqualTo: receiver_uid)
+          .where('receiver_email', isEqualTo: receiver_email)
+          .snapshots();
 
-  addList({required String uid}) async {
-    if ((await reference.where('uid', isEqualTo: uid).get()).size == 0)
-      reference.add({'uid': uid});
+  addList({required User user}) async {
+    if ((await FirebaseFirestore.instance
+                .collection('users')
+                .where('uid', isEqualTo: user.uid)
+                .where('email', isEqualTo: user.email)
+                .get())
+            .size ==
+        0) reference.add(user.toJSON());
   }
 
-  addMessage(
-      {required BuildContext context,
-      required Message message,
-      required String uid}) async {
-    reference
-        .doc(uid)
-        .collection('chat')
-        .add(message.toJSON())
-        .then((value) => print('sent'));
+  addMessage({required BuildContext context, required Message message}) async {
+    reference.add(message.toJSON()).then((value) => print('sent'));
   }
 }

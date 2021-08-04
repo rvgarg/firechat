@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firechat/api/chat_api.dart';
 import 'package:firechat/model/message.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firechat/model/user.dart' as u;
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
-  final String uid;
+  final u.User receiver;
 
-  ChatPage(this.uid);
+  ChatPage(this.receiver);
 
   @override
   State<StatefulWidget> createState() => ChatePageState();
@@ -20,8 +20,17 @@ class ChatePageState extends State<ChatPage> {
 
   @override
   void initState() {
-    stream = ChatApi().getMessages(uid: widget.uid);
-    stream1 = ChatApi().getMessages(uid: widget.uid);
+    User current = FirebaseAuth.instance.currentUser!;
+    stream = ChatApi().getMessages(
+        receiver_email: widget.receiver.email,
+        receiver_uid: widget.receiver.uid,
+        sender_uid: current.uid,
+        sender_email: current.email!);
+    stream1 = ChatApi().getMessages(
+        sender_uid: current.uid,
+        sender_email: current.email!,
+        receiver_uid: widget.receiver.uid,
+        receiver_email: widget.receiver.email);
     stream.listen((res) {
       res.docChanges.forEach((re) {
         switch (re.type) {
@@ -48,7 +57,10 @@ class ChatePageState extends State<ChatPage> {
                   return ListView.builder(
                     itemBuilder: (context, index) {
                       return Container(
-                        width: double.infinity,
+                        alignment: snapshots.data!.docs[index]['uid'] ==
+                                FirebaseAuth.instance.currentUser!.uid
+                            ? Alignment.topRight
+                            : Alignment.topLeft,
                         padding: EdgeInsets.all(10),
                         child: Align(
                           alignment: snapshots.data!.docs[index]['uid'] ==
@@ -57,7 +69,7 @@ class ChatePageState extends State<ChatPage> {
                               : Alignment.topLeft,
                           child: Container(
                             alignment: snapshots.data!.docs[index]['uid'] ==
-                                FirebaseAuth.instance.currentUser!.uid
+                                    FirebaseAuth.instance.currentUser!.uid
                                 ? Alignment.topRight
                                 : Alignment.topLeft,
                             decoration: BoxDecoration(
@@ -68,7 +80,6 @@ class ChatePageState extends State<ChatPage> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             padding: EdgeInsets.all(10),
-                            width: MediaQuery.of(context).size.width * 0.7,
                             child: Text(
                               snapshots.data!.docs[index]['msg'],
                             ),
@@ -91,14 +102,16 @@ class ChatePageState extends State<ChatPage> {
                     icon: Icon(Icons.send),
                     onPressed: () {
                       String text = msg.text.trim();
-                      String user = FirebaseAuth.instance.currentUser!.uid;
-                      String name =
-                          FirebaseAuth.instance.currentUser!.displayName ?? '';
                       ChatApi api = ChatApi();
                       api.addMessage(
-                          context: context,
-                          message: Message(msg: text, uid: user, dname: name),
-                          uid: widget.uid
+                        context: context,
+                        message: Message(
+                            msg: text,
+                            sender_email:
+                                FirebaseAuth.instance.currentUser!.email!,
+                            sender_uid: FirebaseAuth.instance.currentUser!.uid!,
+                            receiver_uid: widget.receiver.uid,
+                            receiver_email: widget.receiver.email),
                       );
                       msg.clear();
                     },

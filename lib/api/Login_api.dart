@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firechat/api/chat_api.dart';
+import 'package:firechat/model/user.dart' as u;
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -19,7 +20,9 @@ class LoginApi {
         idToken: googleSignInAuthentication.idToken,
         accessToken: googleSignInAuthentication.accessToken);
     await auth.signInWithCredential(credential).then((value) {
-      ChatApi().addList(uid: auth.currentUser!.uid);
+      ChatApi().addList(
+          user: u.User(
+              uid: auth.currentUser!.uid, email: auth.currentUser!.email!));
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Logged In!!')));
       Navigator.of(context).pushNamed('/chat');
@@ -36,6 +39,9 @@ class LoginApi {
       auth
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((value) {
+        ChatApi().addList(
+            user: u.User(
+                uid: auth.currentUser!.uid, email: auth.currentUser!.email!));
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Logged In!!')));
         Navigator.of(context).pushNamed('/chat');
@@ -73,6 +79,10 @@ class LoginApi {
           timeout: Duration(seconds: 20),
           verificationCompleted: (phoneAuthCredential) async {
             await auth.signInWithCredential(phoneAuthCredential).then((value) {
+              ChatApi().addList(
+                  user: u.User(
+                      uid: auth.currentUser!.uid,
+                      email: auth.currentUser!.phoneNumber!));
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text('Logged In!!')));
               Navigator.of(context).pushNamed('/chat');
