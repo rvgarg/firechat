@@ -24,7 +24,8 @@ class LoginApi {
           user: u.User(
               uid: auth.currentUser!.uid,
               email: auth.currentUser!.email!,
-              name: auth.currentUser!.displayName!));
+              name: auth.currentUser!.displayName!,
+              pic_link: googleSignInAccount.photoUrl!));
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Logged In!!')));
       Navigator.of(context).pushNamed('/chat');

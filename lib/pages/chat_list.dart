@@ -17,30 +17,31 @@ class ChatListState extends State<ChatList> {
         stream: ChatApi().getList(),
         builder: (context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
+          return !snapshot.hasData ? Center(
               child: CircularProgressIndicator(),
-            );
-          } else {
-            return ListView.builder(
+            ) : ListView.builder(
               itemBuilder: (context, index) {
                 return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => ChatPage(User.fromJSON(
-                                  snapshot.data!.docs![index].data()))));
-                    },
+                                  snapshot.data!.docs![index].data())))),
                     child: Stack(
                       children: [
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
-                            child: Icon(
-                              Icons.person,
-                              size: 30,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: snapshot.data!.docs[index]['pic_link'] ==
+                                      null
+                                  ? Icon(Icons.person)
+                                  : Image.network(
+                                      snapshot.data!.docs[index]['pic_link'],
+                                      scale: 0.4,
+                                    ),
                             ),
                           ),
                         ),
@@ -48,16 +49,23 @@ class ChatListState extends State<ChatList> {
                           padding: EdgeInsets.all(20),
                           child: Align(
                             alignment: Alignment.center,
-                            child: Text(snapshot.data!.docs[index]['name'],style: TextStyle(fontSize: 20),),
+                            child: Text(
+                              snapshot.data!.docs[index]['name'],
+                              style: TextStyle(fontSize: 20),
+                            ),
                           ),
                         ),
                       ],
-                    ));
+                    ),
+                );
               },
               itemCount: snapshot.data!.docs.length,
             );
-          }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(Icons.group_add),
       ),
     );
   }
