@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firechat/api/chat_api.dart';
 import 'package:firechat/api/group_api.dart';
 import 'package:firechat/model/group.dart';
-import 'package:firechat/model/user.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class NewGroupPage extends StatefulWidget {
   @override
@@ -11,15 +14,34 @@ class NewGroupPage extends StatefulWidget {
 }
 
 class NewGroupState extends State<NewGroupPage> {
-  List<User> new_g = [];
+  List<Map<String, dynamic>> new_g = [];
   var name = TextEditingController();
   var key = GlobalKey<FormState>();
+  File? _image;
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(),
         body: Center(
-          child: Column(
+          child: ListView(
             children: [
+              ClipRRect(
+                child: _image != null
+                    ? Image.file(
+                        _image!,
+                        height: 60,
+                        width: 60,
+                      )
+                    : IconButton(
+                        onPressed: () => showPicker(),
+                        icon: Icon(
+                          Icons.image_outlined,
+                          color: Colors.black,
+                        ),
+                        iconSize: 60,
+                      ),
+                borderRadius: BorderRadius.circular(20),
+              ),
               Form(
                 child: TextFormField(
                   controller: name,
@@ -32,16 +54,40 @@ class NewGroupState extends State<NewGroupPage> {
                 ),
                 key: key,
               ),
+              ListView.builder(
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      new_g.removeAt(index);
+                    },
+                    child: Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: SizedBox(
+                            child: Image.network(new_g[index]['pic_link']),
+                            height: 35,
+                            width: 35,
+                          ),
+                        ),
+                        Text(new_g[index]['name']),
+                      ],
+                    ),
+                  );
+                },
+                scrollDirection: Axis.horizontal,
+                itemCount: new_g.length,
+              ),
               StreamBuilder(
                 builder: (context,
                         AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
                             snapshot) =>
                     snapshot.hasData
                         ? ListView.builder(
+                            shrinkWrap: true,
                             itemBuilder: (context, index) => GestureDetector(
                               onTap: () {
-                                new_g.add(User.fromJSON(
-                                    snapshot.data!.docs[index].data()));
+                                new_g.add(snapshot.data!.docs[index].data());
                               },
                               child: Stack(
                                 children: [
@@ -51,15 +97,19 @@ class NewGroupState extends State<NewGroupPage> {
                                       padding: const EdgeInsets.all(20.0),
                                       child: ClipRRect(
                                         borderRadius:
-                                            BorderRadius.circular(8.0),
+                                            BorderRadius.circular(18.0),
                                         child: snapshot.data!.docs[index]
                                                     ['pic_link'] ==
                                                 null
                                             ? Icon(Icons.person)
-                                            : Image.network(
-                                                snapshot.data!.docs[index]
-                                                    ['pic_link'],
-                                                scale: 0.4,
+                                            : SizedBox(
+                                                height: 35,
+                                                width: 35,
+                                                child: Image.network(
+                                                  snapshot.data!.docs[index]
+                                                      ['pic_link'],
+                                                  scale: 0.4,
+                                                ),
                                               ),
                                       ),
                                     ),
@@ -89,8 +139,71 @@ class NewGroupState extends State<NewGroupPage> {
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.save),
-          onPressed: () => GroupApi()
-              .addGroup(Group(participants: new_g, name: name.text.trim())),
+          onPressed: () async {
+            if (_image != null) {
+              UploadTask task =
+                  FirebaseStorage.instance.ref(_image!.path).putFile(_image!);
+              var path = await (await task).ref.getDownloadURL();
+              print(path);
+              print(name.text.trim());
+              GroupApi().addGroup(
+                  Group(
+                      participants: new_g,
+                      name: name.text.trim(),
+                      pic_link: path),
+                  context);
+            } else {
+              GroupApi().addGroup(
+                  Group(participants: new_g, name: name.text.trim()), context);
+            }
+          },
         ),
       );
+
+  void showPicker() => showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Container(
+            child: new Wrap(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.photo_library),
+                  title: Text('Gallery'),
+                  onTap: () {
+                    _imgFromGallery();
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo_camera),
+                  title: Text('Camera'),
+                  onTap: () {
+                    _imgFromCamera();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+
+  _imgFromCamera() async {
+    var image = await ImagePicker()
+        .pickImage(source: ImageSource.camera, imageQuality: 50);
+
+    setState(() {
+      _image = File(image!.path);
+    });
+  }
+
+  _imgFromGallery() async {
+    var image = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 50);
+
+    setState(() {
+      _image = File(image!.path);
+    });
+  }
 }

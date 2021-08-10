@@ -28,6 +28,7 @@ class LoginApi {
               pic_link: googleSignInAccount.photoUrl!));
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Logged In!!')));
+      Navigator.of(context).pop();
       Navigator.of(context).pushNamed('/chat');
     }).catchError((onError) {
       print(onError);

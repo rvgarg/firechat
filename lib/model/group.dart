@@ -1,7 +1,5 @@
-import 'package:firechat/model/user.dart';
-
 class Group {
-  final List<User> participants;
+  final List<dynamic> participants;
   final String name;
   final String? pic_link;
 

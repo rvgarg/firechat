@@ -34,5 +34,6 @@ class ChatApi {
         0) FirebaseFirestore.instance.collection('users').add(user.toJSON());
   }
 
-  addMessage({required BuildContext context, required Message message}) async => reference.add(message.toJSON()).then((value) => print('sent'));
+  addMessage({required BuildContext context, required Message message}) async =>
+      await reference.add(message.toJSON()).then((value) => print('sent'));
 }
