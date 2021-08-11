@@ -63,17 +63,36 @@ class NewGroupState extends State<NewGroupPage> {
                     },
                     child: Column(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(50),
-                          child: SizedBox(
-                            child: CachedNetworkImage(
-                              height: 35,
-                              width: 35,
-                              imageUrl: new_g[index]['pic_link'],
+                        Stack(
+                          children: [
+                            Center(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: SizedBox(
+                                  child: CachedNetworkImage(
+                                    height: 35,
+                                    width: 35,
+                                    imageUrl: new_g[index]['pic_link'],
+                                  ),
+                                  height: 35,
+                                  width: 35,
+                                ),
+                              ),
                             ),
-                            height: 35,
-                            width: 35,
-                          ),
+                            Align(
+                              child: ClipRRect(
+                                child: Container(
+                                  color: Colors.teal,
+                                  child: Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              alignment: Alignment.bottomRight,
+                            )
+                          ],
                         ),
                         Text(new_g[index]['name']),
                       ],
