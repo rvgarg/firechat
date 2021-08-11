@@ -79,7 +79,7 @@ class ChatListState extends State<ChatList> {
                             child: Padding(
                               padding: const EdgeInsets.all(20.0),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(28.0),
+                                borderRadius: BorderRadius.circular(50.0),
                                 child: snapshot.data!.docs[index]['pic_link'] ==
                                         null
                                     ? Icon(Icons.person)
@@ -139,7 +139,7 @@ class ChatListState extends State<ChatList> {
                             child: Padding(
                               padding: const EdgeInsets.all(20.0),
                               child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(18.0),
+                                  borderRadius: BorderRadius.circular(50.0),
                                   child: snapshot.data!.docs[index]
                                               ['pic_link'] ==
                                           null

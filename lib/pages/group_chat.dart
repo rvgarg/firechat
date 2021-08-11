@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firechat/api/group_chat.dart';
@@ -34,12 +35,6 @@ class GroupChatState extends State<GroupChat> {
         switch (element.type) {
           case DocumentChangeType.added:
             break;
-          case DocumentChangeType.modified:
-            // TODO: Handle this case.
-            break;
-          case DocumentChangeType.removed:
-            // TODO: Handle this case.
-            break;
         }
       });
     });
@@ -56,7 +51,24 @@ class GroupChatState extends State<GroupChat> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text(widget.group.name),
+          title: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: SizedBox(
+                    height: 35,
+                    width: 35,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.group.pic_link!,
+                    ),
+                  ),
+                ),
+              ),
+              Text(widget.group.name),
+            ],
+          ),
         ),
         body: Stack(
           children: [
@@ -91,7 +103,7 @@ class GroupChatState extends State<GroupChat> {
                                         user.uid
                                     ? Colors.blue
                                     : Colors.red,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(50),
                               ),
                               padding: EdgeInsets.all(10),
                               child: Text(
@@ -109,22 +121,42 @@ class GroupChatState extends State<GroupChat> {
               stream: stream,
             ),
             Align(
-              child: TextFormField(
-                controller: msg,
-                decoration: InputDecoration(
-                  hintText: 'Message',
-                  suffix: IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: () {
-                      String text = msg.text.trim();
-                      GroupChatApi().addMessage(GroupMessage(
-                          gid: widget.gid,
-                          sender_uid: user.uid,
-                          message: text,
-                          sender_name: user.displayName!));
-                      msg.clear();
-                    },
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Row(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      child: TextFormField(
+                        controller: msg,
+                        decoration: InputDecoration(
+                          hintText: 'Message',
+                        ),
+                      ),
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: Container(
+                        padding: EdgeInsets.all(5.0),
+                        color: Colors.teal,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            String text = msg.text.trim();
+                            GroupChatApi().addMessage(GroupMessage(
+                                gid: widget.gid,
+                                sender_uid: user.uid,
+                                message: text,
+                                sender_name: user.displayName!));
+                            msg.clear();
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               alignment: Alignment.bottomCenter,

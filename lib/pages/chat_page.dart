@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firechat/api/chat_api.dart';
@@ -46,7 +47,31 @@ class ChatePageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text(widget.receiver.name),
+          title: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: SizedBox(
+                    height: 35,
+                    width: 35,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.receiver.pic_link!,
+                    ),
+                  ),
+                ),
+              ),
+              Text(widget.receiver.name),
+            ],
+          ),
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+          ),
         ),
         body: Stack(
           children: [
@@ -78,7 +103,7 @@ class ChatePageState extends State<ChatPage> {
                                       FirebaseAuth.instance.currentUser!.uid
                                   ? Colors.blue
                                   : Colors.red,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(50),
                             ),
                             padding: EdgeInsets.all(10),
                             child: Text(
@@ -95,27 +120,48 @@ class ChatePageState extends State<ChatPage> {
               stream: stream1,
             ),
             Align(
-              child: TextFormField(
-                controller: msg,
-                decoration: InputDecoration(
-                  hintText: 'Message',
-                  suffix: IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: () {
-                      String text = msg.text.trim();
-                      ChatApi().addMessage(
-                        context: context,
-                        message: Message(
-                            msg: text,
-                            sender_email:
-                                FirebaseAuth.instance.currentUser!.email!,
-                            sender_uid: FirebaseAuth.instance.currentUser!.uid,
-                            receiver_uid: widget.receiver.uid,
-                            receiver_email: widget.receiver.email),
-                      );
-                      msg.clear();
-                    },
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Row(
+                  children: [
+                    Container(
+                      child: TextFormField(
+                        controller: msg,
+                        decoration: InputDecoration(
+                          hintText: 'Message',
+                        ),
+                      ),
+                      width: MediaQuery.of(context).size.width * 0.75,
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: Container(
+                        padding: EdgeInsets.all(5.0),
+                        color: Colors.teal,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            String text = msg.text.trim();
+                            ChatApi().addMessage(
+                              context: context,
+                              message: Message(
+                                  msg: text,
+                                  sender_email:
+                                      FirebaseAuth.instance.currentUser!.email!,
+                                  sender_uid:
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                  receiver_uid: widget.receiver.uid,
+                                  receiver_email: widget.receiver.email),
+                            );
+                            msg.clear();
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               alignment: Alignment.bottomCenter,

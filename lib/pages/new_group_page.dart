@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firechat/api/chat_api.dart';
@@ -40,7 +41,7 @@ class NewGroupState extends State<NewGroupPage> {
                         ),
                         iconSize: 60,
                       ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(50),
               ),
               Form(
                 child: TextFormField(
@@ -63,9 +64,13 @@ class NewGroupState extends State<NewGroupPage> {
                     child: Column(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(50),
                           child: SizedBox(
-                            child: Image.network(new_g[index]['pic_link']),
+                            child: CachedNetworkImage(
+                              height: 35,
+                              width: 35,
+                              imageUrl: new_g[index]['pic_link'],
+                            ),
                             height: 35,
                             width: 35,
                           ),
@@ -97,7 +102,7 @@ class NewGroupState extends State<NewGroupPage> {
                                       padding: const EdgeInsets.all(20.0),
                                       child: ClipRRect(
                                         borderRadius:
-                                            BorderRadius.circular(18.0),
+                                            BorderRadius.circular(50.0),
                                         child: snapshot.data!.docs[index]
                                                     ['pic_link'] ==
                                                 null
@@ -105,10 +110,11 @@ class NewGroupState extends State<NewGroupPage> {
                                             : SizedBox(
                                                 height: 35,
                                                 width: 35,
-                                                child: Image.network(
-                                                  snapshot.data!.docs[index]
-                                                      ['pic_link'],
-                                                  scale: 0.4,
+                                                child: CachedNetworkImage(
+                                                  height: 35,
+                                                  width: 35,
+                                                  imageUrl: snapshot.data!
+                                                      .docs[index]['pic_link'],
                                                 ),
                                               ),
                                       ),
