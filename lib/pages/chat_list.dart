@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firechat/api/chat_api.dart';
@@ -126,12 +127,13 @@ class ChatListState extends State<ChatList> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => GroupChat(
-                                  Group.fromJSON(
-                                      snapshot.data!.docs[index].data()),
-                                  snapshot.data!.docs[index].id))),
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => GroupChat(
+                                Group.fromJSON(
+                                    snapshot.data!.docs[index].data()),
+                                snapshot.data!.docs[index].id)),
+                      ),
                       child: Stack(
                         children: [
                           Align(
@@ -139,20 +141,19 @@ class ChatListState extends State<ChatList> {
                             child: Padding(
                               padding: const EdgeInsets.all(20.0),
                               child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(50.0),
-                                  child: snapshot.data!.docs[index]
-                                              ['pic_link'] ==
-                                          null
-                                      ? Icon(Icons.person)
-                                      : SizedBox(
-                                          width: 35,
-                                          height: 35,
-                                          child: Image.network(
-                                            snapshot.data!.docs[index]
-                                                ['pic_link'],
-                                            scale: 0.4,
-                                          ),
-                                        )),
+                                borderRadius: BorderRadius.circular(50.0),
+                                child: snapshot.data!.docs[index]['pic_link'] ==
+                                        null
+                                    ? Icon(Icons.person)
+                                    : SizedBox(
+                                        width: 35,
+                                        height: 35,
+                                        child: CachedNetworkImage(
+                                          imageUrl: snapshot.data!.docs[index]
+                                              ['pic_link'],
+                                        ),
+                                      ),
+                              ),
                             ),
                           ),
                           Padding(

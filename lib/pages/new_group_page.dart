@@ -22,145 +22,96 @@ class NewGroupState extends State<NewGroupPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: ListView(
-            children: [
-              ClipRRect(
-                child: _image != null
-                    ? Image.file(
-                        _image!,
-                        height: 60,
-                        width: 60,
-                      )
-                    : IconButton(
-                        onPressed: () => showPicker(),
-                        icon: Icon(
-                          Icons.image_outlined,
-                          color: Colors.black,
-                        ),
-                        iconSize: 60,
+        appBar: AppBar(
+          title: Form(
+            child: TextFormField(
+              controller: name,
+              validator: (value) {
+                if (value == null) return 'Group Name is required';
+              },
+              decoration: InputDecoration(
+                labelText: 'Group Name',
+              ),
+            ),
+            key: key,
+          ),
+        ),
+        body: Column(
+          children: [
+            ClipRRect(
+              child: _image != null
+                  ? Image.file(
+                      _image!,
+                      height: 60,
+                      width: 60,
+                    )
+                  : IconButton(
+                      onPressed: () => showPicker(),
+                      icon: Icon(
+                        Icons.image_outlined,
+                        color: Colors.black,
                       ),
-                borderRadius: BorderRadius.circular(50),
-              ),
-              Form(
-                child: TextFormField(
-                  controller: name,
-                  validator: (value) {
-                    if (value == null) return 'Group Name is required';
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Group Name',
-                  ),
-                ),
-                key: key,
-              ),
-              ListView.builder(
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      new_g.removeAt(index);
-                    },
-                    child: Column(
-                      children: [
-                        Stack(
-                          children: [
-                            Center(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: SizedBox(
-                                  child: CachedNetworkImage(
-                                    height: 35,
-                                    width: 35,
-                                    imageUrl: new_g[index]['pic_link'],
-                                  ),
-                                  height: 35,
-                                  width: 35,
-                                ),
-                              ),
-                            ),
-                            Align(
-                              child: ClipRRect(
-                                child: Container(
-                                  color: Colors.teal,
-                                  child: Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              alignment: Alignment.bottomRight,
-                            )
-                          ],
-                        ),
-                        Text(new_g[index]['name']),
-                      ],
+                      iconSize: 60,
                     ),
-                  );
-                },
-                scrollDirection: Axis.horizontal,
-                itemCount: new_g.length,
-              ),
-              StreamBuilder(
-                builder: (context,
-                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                            snapshot) =>
-                    snapshot.hasData
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) => GestureDetector(
-                              onTap: () {
-                                new_g.add(snapshot.data!.docs[index].data());
-                              },
-                              child: Stack(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(50.0),
-                                        child: snapshot.data!.docs[index]
-                                                    ['pic_link'] ==
-                                                null
-                                            ? Icon(Icons.person)
-                                            : SizedBox(
+              borderRadius: BorderRadius.circular(50),
+            ),
+            StreamBuilder(
+              builder: (context,
+                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                          snapshot) =>
+                  snapshot.hasData
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) => GestureDetector(
+                            onTap: () {
+                              new_g.add(snapshot.data!.docs[index].data());
+                            },
+                            child: Stack(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50.0),
+                                      child: snapshot.data!.docs[index]
+                                                  ['pic_link'] ==
+                                              null
+                                          ? Icon(Icons.person)
+                                          : SizedBox(
+                                              height: 35,
+                                              width: 35,
+                                              child: CachedNetworkImage(
                                                 height: 35,
                                                 width: 35,
-                                                child: CachedNetworkImage(
-                                                  height: 35,
-                                                  width: 35,
-                                                  imageUrl: snapshot.data!
-                                                      .docs[index]['pic_link'],
-                                                ),
+                                                imageUrl: snapshot.data!
+                                                    .docs[index]['pic_link'],
                                               ),
-                                      ),
+                                            ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.all(20),
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        snapshot.data!.docs[index]['name'],
-                                        style: TextStyle(fontSize: 20),
-                                      ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      snapshot.data!.docs[index]['name'],
+                                      style: TextStyle(fontSize: 20),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            itemCount: snapshot.data!.docs.length,
-                          )
-                        : Center(
-                            child: CircularProgressIndicator(),
                           ),
-                stream: ChatApi().getList(),
-              ),
-            ],
-          ),
+                          itemCount: snapshot.data!.docs.length,
+                        )
+                      : Center(
+                          child: CircularProgressIndicator(),
+                        ),
+              stream: ChatApi().getList(),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.save),

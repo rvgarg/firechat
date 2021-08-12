@@ -17,12 +17,14 @@ class ChatApi {
           required String sender_email,
           required String receiver_uid,
           required String receiver_email}) =>
-      reference
-          .where('sender_uid', isEqualTo: sender_uid)
-          .where('sender_email', isEqualTo: sender_email)
-          .where('receiver_uid', isEqualTo: receiver_uid)
-          .where('receiver_email', isEqualTo: receiver_email)
-          .snapshots();
+      reference.where('sender_uid', whereIn: [sender_uid, receiver_uid]).where(
+          'sender_email',
+          whereIn: [
+            sender_email,
+            receiver_email
+          ]).where('receiver_uid', whereIn: [receiver_uid, sender_uid]).where(
+          'receiver_email',
+          whereIn: [receiver_email, sender_email]).snapshots();
 
   addList({required User user}) async {
     if ((await FirebaseFirestore.instance
